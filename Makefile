@@ -1,18 +1,21 @@
 JFLAGS = -g
 JC = javac
+JAVA_OPTIONS = -Werror
 CFLAGS = -I./clox
 CC = gcc
 
-JCLASS := $(patsubst %.java, %.class , $(wildcard jlox/*.java))
+JCLASS := $(addprefix build/, $(patsubst %.java, %.class , $(wildcard jlox/com/craftinginterpreters/lox/*.java)))
 OBJS := $(patsubst %.c, %.o , $(wildcard clox/*.c))
 HEADERS := $(wildcard clox/*.h)
 
-.SUFFIXES: .java .class
+# .SUFFIXES: .java .class
 
 all: jlox clox
 
-%.class: %.java
-	$(JC) $(JFLAGS) $*.java
+build/jlox/%.class: jlox/%.java
+	@ printf "%8s %-30s %s\n" $(JC) $< "$(JAVA_OPTIONS)"
+	@ mkdir -p build/jlox
+	@ $(JC) -cp jlox -d build/jlox $(JAVA_OPTIONS) -implicit:none $<
 
 jlox: $(JCLASS)
 
@@ -23,6 +26,5 @@ clox: $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	rm -f jlox/*.class
-	rm -f clox/*.o
-	rm -f clox/clox
+	rm -rf build
+	rm -f clox
