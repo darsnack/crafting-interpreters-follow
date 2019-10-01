@@ -162,6 +162,11 @@ class Scanner {
           // A comment goes until the end of the line.
           // ignore comments
           while (peek() != '\n' && !isAtEnd()) advance();
+        } else if (match('*')) {
+          // ignore multiple lines of comments
+          while (!(peek() == '*' && peekNext() == '/') && !isAtEnd()) advance();
+          advance(); // consume final */
+          advance();
         } else {
           addToken(SLASH);
         }
